@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "482452039369",
+    "firebase_url": "https://raja-jain-official-project.firebaseio.com",
+    "project_id": "raja-jain-official-project",
+    "storage_bucket": "raja-jain-official-project.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:482452039369:android:a2b4eadf6dddafacbfcf18",
+        "android_client_info": {
+          "package_name": "com.example.rajajainofficalproject"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "482452039369-3stu7dfccaoo09msrart0qtlm1ilto4o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.rajajainofficalproject",
+            "certificate_hash": "7adc6acf28d897e173cc8bddb5d012f2a6198655"
+          }
+        },
+        {
+          "client_id": "482452039369-37i3oucstoh645bg5r9n5ts6ne9vrre7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWsOzXWRXHJnvtPqZTePAM-vlU1tZtDRs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "482452039369-37i3oucstoh645bg5r9n5ts6ne9vrre7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
