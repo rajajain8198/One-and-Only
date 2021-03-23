@@ -50,13 +50,7 @@ import de.hdodenhof.circleimageview.CircleImageView;
 
 public class LoginActivity extends AppCompatActivity {
 
-  //  private static final String TAG = "GoogleActivity";
-
-
-
-
     private static final String TAG = "MyFirebaseMsgService";
-
     private static final int RC_SIGN_IN = 9001;
     String device_token;
     Button btnLogIn;
@@ -108,13 +102,13 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseInstanceId.getInstance().getInstanceId().addOnCompleteListener(new OnCompleteListener<InstanceIdResult>() {
             @Override
             public void onComplete(@NonNull Task<InstanceIdResult> task) {
-                if(!task.isSuccessful()) {
+                if (!task.isSuccessful()) {
                     Log.d(TAG, "Task Failed");
                     return;
-                }else {
-                     device_token = String.valueOf(task.getResult().getToken());
-                    if (device_token != null){
-                      //  prefsUser.setDevice_token(device_token);
+                } else {
+                    device_token = String.valueOf(task.getResult().getToken());
+                    if (device_token != null) {
+                        //  prefsUser.setDevice_token(device_token);
                         Log.d(TAG, "Device Token is : " + device_token);
                     }
                 }
@@ -136,7 +130,8 @@ public class LoginActivity extends AppCompatActivity {
                     etUserID.setError("User ID not be null");
                 } else if (etPassword.getText().toString().matches("")) {
                     etPassword.setError("Password not be null");
-                }  if (cbCheckBox.isChecked() == false) {
+                }
+                if (cbCheckBox.isChecked() == false) {
                     Toast.makeText(LoginActivity.this, "Read Terms and Condition", Toast.LENGTH_SHORT).show();
                 } else {
                     progressBar.setVisibility(View.VISIBLE);
@@ -204,7 +199,7 @@ public class LoginActivity extends AppCompatActivity {
             Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
             try {
                 GoogleSignInAccount account = task.getResult(ApiException.class);
-              //  firebaseAuthWithGoogle(account);
+                //  firebaseAuthWithGoogle(account);
             } catch (ApiException e) {
                 ;
                 Toast.makeText(this, "  Not Equal \n  " + e + " \n " + data, Toast.LENGTH_SHORT).show();
@@ -263,7 +258,7 @@ public class LoginActivity extends AppCompatActivity {
 //
 ////            findViewById(R.id.signInButton).setVisibility(View.VISIBLE);
 ////            findViewById(R.id.signOutAndDisconnect).setVisibility(View.GONE);
-        }
+    }
 
 
     public void userLogin(String userID, String password) {
@@ -283,14 +278,14 @@ public class LoginActivity extends AppCompatActivity {
                     String Pass = snapshot.child("password").getValue(String.class);
                     if (etPassword.getText().toString().trim().equals(Pass)) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        if (!uniqueID.isEmpty()){
+                        if (!uniqueID.isEmpty()) {
                             sh.putString("user_unique_id", uniqueID);
                             sh.apply();
                             user_details = new UserDetails(uniqueID, userID, Name, Image, Email, Mobile_Number, Pass);
                             userDetailsRoomDatabase.productDao().insertDetails(user_details);
-                            Toast.makeText(LoginActivity.this, "Unique ID Found : " +uniqueID, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "Unique ID Found : " + uniqueID, Toast.LENGTH_SHORT).show();
 
-                        }else {
+                        } else {
                             Toast.makeText(LoginActivity.this, "No Unique ID", Toast.LENGTH_SHORT).show();
                         }
 
@@ -300,7 +295,8 @@ public class LoginActivity extends AppCompatActivity {
                         etUserID.getText().clear();
                         etPassword.getText().clear();
                         startActivity(new Intent(LoginActivity.this, DashBoardActivity.class));
-                        finish();                    } else {
+                        finish();
+                    } else {
                         Toast.makeText(LoginActivity.this, "User Email and Password not Match", Toast.LENGTH_SHORT).show();
                         progressBar.setVisibility(View.GONE);
                     }
