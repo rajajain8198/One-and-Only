@@ -53,6 +53,8 @@ public class LoginActivity extends AppCompatActivity {
   //  private static final String TAG = "GoogleActivity";
 
 
+
+
     private static final String TAG = "MyFirebaseMsgService";
 
     private static final int RC_SIGN_IN = 9001;
