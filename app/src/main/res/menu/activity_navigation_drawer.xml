@@ -9,9 +9,17 @@
             android:icon="@drawable/icon_profile"
             android:title="@string/menu_profile" />
         <item
+            android:id="@+id/nav_payment"
+            android:icon="@drawable/payment"
+            android:title="@string/icon_payment" />
+        <item
             android:id="@+id/nav_map"
             android:icon="@drawable/icon_map"
             android:title="@string/menu_map" />
+        <item
+            android:id="@+id/nav_search"
+            android:icon="@drawable/search"
+            android:title="@string/menu_search" />
         <item
             android:id="@+id/nav_setting"
             android:icon="@drawable/icon_setting"
