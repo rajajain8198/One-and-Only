@@ -141,7 +141,6 @@ public class LoginActivity extends AppCompatActivity {
                     userLogin(userEmail, userPassword);
                 }
 
-                // gg  startActivity(new Intent(MainActivity.this,  MapsActivity.class));
             }
         });
 
