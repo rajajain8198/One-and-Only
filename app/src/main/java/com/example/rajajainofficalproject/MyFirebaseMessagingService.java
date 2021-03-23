@@ -24,6 +24,7 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 
     String  title = "Title", message = "Message", fromReceivingID = "100";
     String token = null;
+    //String token = null;
     private static final String TAG = "MyFirebaseMsgService";
     public static final String ACTION_NOTIFICATION = "action_notification";
     public static final String EXTRA_NOTIFICATION_MESSAGE = "extra_message";
