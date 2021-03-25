@@ -26,6 +26,7 @@ import com.example.rajajainofficalproject.Activity.QR_Code_Activity;
 import com.example.rajajainofficalproject.Activity.SettingActivity;
 import com.example.rajajainofficalproject.Activity.UPI_Payment_Activity;
 import com.example.rajajainofficalproject.Activity.UserDetailsActivity;
+import com.example.rajajainofficalproject.Class.Constant;
 import com.example.rajajainofficalproject.Database.UserDetailsRoomDatabase;
 import com.example.rajajainofficalproject.R;
 import com.firebase.ui.auth.AuthUI;
@@ -164,12 +165,12 @@ public class HomeFragment extends Fragment implements View.OnClickListener, Paym
                 .addOnCompleteListener(new OnCompleteListener<Void>() {
                     public void onComplete(@NonNull Task<Void> task) {
                         // user is now signed out
-                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences("user_details", getActivity().MODE_PRIVATE);
+                        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(Constant.Shared_Preferences, getActivity().MODE_PRIVATE);
                         SharedPreferences.Editor sh = sharedPreferences.edit();
 
                         UserDetailsRoomDatabase userDetailsRoomDatabase = UserDetailsRoomDatabase.getDatabase(context);
-                        userDetailsRoomDatabase.productDao().deleteDetails(sharedPreferences.getString("user_unique_id",""));
-                        sh.putString("user_unique_id", "");
+                        userDetailsRoomDatabase.productDao().deleteDetails(sharedPreferences.getString(Constant.Shared_Preferences_User_Unique_ID,""));
+                        sh.putString(Constant.Shared_Preferences_User_Unique_ID, "");
                         sh.apply();
                         startActivity(new Intent(context, LoginActivity.class));
                         getActivity().finish();

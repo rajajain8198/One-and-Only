@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.widget.Toast;
 
+import com.example.rajajainofficalproject.Class.Constant;
 import com.example.rajajainofficalproject.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,14 +25,14 @@ public class SplashScreenActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
-        sharedPreferences = getSharedPreferences("user_details", this.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Constant.Shared_Preferences, this.MODE_PRIVATE);
 
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-        Unique_ID = sharedPreferences.getString("user_unique_id","");
+        Unique_ID = sharedPreferences.getString(Constant.Shared_Preferences_User_Unique_ID,"");
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

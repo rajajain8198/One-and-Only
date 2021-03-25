@@ -1,13 +1,24 @@
 package com.example.rajajainofficalproject.Activity;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.ContentResolver;
+import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
+import android.webkit.MimeTypeMap;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,10 +26,14 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.example.rajajainofficalproject.Class.Constant;
 import com.example.rajajainofficalproject.Database.UserDetails;
 import com.example.rajajainofficalproject.Database.UserDetailsRoomDatabase;
 import com.example.rajajainofficalproject.R;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
@@ -26,7 +41,18 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,13 +67,15 @@ public class UserDetailsActivity extends AppCompatActivity {
     Button btnSubmitButton;
     FirebaseUser firebaseUser;
     FirebaseAuth mAuth;
+    StorageReference storageRef;
     FirebaseDatabase firebaseDatabase;
     DatabaseReference databaseReference;
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor sh;
     List<UserDetails> userDetailsList;
 
-    String Name = null, Email= null, Password= null, Mobile_Number= null, Unique_ID= null, userID= null, Image= null;
+    Uri selectedImageUri = null;
+    String Name = null, Email = null, Password = null, Mobile_Number = null, Unique_ID = null, userID = null, Image = null;
     UserDetailsRoomDatabase userDetailsRoomDatabase;
 
     @Override
@@ -56,12 +84,15 @@ public class UserDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_user_details);
         initViews();
 
+        sharedPreferences = getSharedPreferences(Constant.Shared_Preferences, this.MODE_PRIVATE);
+        sh = sharedPreferences.edit();
         firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference("User_Details");
-        sharedPreferences = getSharedPreferences("user_details", this.MODE_PRIVATE);
+        databaseReference = firebaseDatabase.getReference(Constant.Firebase_Database_Reference_Path);
+        storageRef = FirebaseStorage.getInstance().getReference();
         userDetailsRoomDatabase = UserDetailsRoomDatabase.getDatabase(this);
         userDetailsList = new ArrayList();
-        Unique_ID = sharedPreferences.getString("user_unique_id","");
+        Unique_ID = sharedPreferences.getString(Constant.Shared_Preferences_User_Unique_ID, "");
+        Image = sharedPreferences.getString("ImageURL", "");
         readDetails(Unique_ID);
 
         btnSubmitButton.setOnClickListener(new View.OnClickListener() {
@@ -89,7 +120,13 @@ public class UserDetailsActivity extends AppCompatActivity {
         imgUpdateUserPitcher.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+//                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+//                intent.setType("image/*");
+//                startActivityForResult(intent, 2);
 
+                Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+                intent.setType("image/*");
+                startActivityForResult(intent, 2);
 
             }
         });
@@ -107,23 +144,35 @@ public class UserDetailsActivity extends AppCompatActivity {
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Image = sharedPreferences.getString("ImageURL", "");
+        if (selectedImageUri != null) {
+            Glide.with(this).load(selectedImageUri).into(imgUserPitcher);
+        } else {
+            Glide.with(this).load(Image).into(imgUserPitcher);
+        }
+    }
+
     private void readDetails(String user_unique_id) {
 
-        if (user_unique_id.equals("")){
+        if (user_unique_id.equals("")) {
             Name = "Name";
             Email = "Email";
             Password = "Password";
             Mobile_Number = "Mobile Number";
-        }else{
+        } else {
             userDetailsList = userDetailsRoomDatabase.productDao().getAllDetails(user_unique_id);
             userID = userDetailsList.get(0).getUserID();
-            Image =userDetailsList.get(0).getImage();
+            Image = userDetailsList.get(0).getImage();
             Name = userDetailsList.get(0).getName();
             Email = userDetailsList.get(0).getEmail();
             Password = userDetailsList.get(0).getPassword();
             Mobile_Number = userDetailsList.get(0).getNumber();
         }
-        Toast.makeText(this, " Your unique ID : \n" + sharedPreferences.getString("user_unique_id",""), Toast.LENGTH_SHORT).show();
+        Log.d("TAG", " Image From Firebase : " + Image);
+        Toast.makeText(this, " Your unique ID : \n" + sharedPreferences.getString(Constant.Shared_Preferences_User_Unique_ID, ""), Toast.LENGTH_SHORT).show();
     }
 
     private void initViews() {
@@ -149,9 +198,8 @@ public class UserDetailsActivity extends AppCompatActivity {
                 etPassword.getText().toString().isEmpty() || etReEnterPassword.getText().toString().isEmpty()) {
             Toast.makeText(UserDetailsActivity.this, "Enter Details Properly", Toast.LENGTH_SHORT).show();
             return false;
-
         }
-//        else if (etPassword.getText().toString() != etReEnterPassword.getText().toString()) {
+//        else if (!etPassword.getText().toString().equals(etReEnterPassword.getText())) {
 //
 //            Toast.makeText(UserDetailsActivity.this, "Password are different", Toast.LENGTH_SHORT).show();
 //            return false;
@@ -159,7 +207,7 @@ public class UserDetailsActivity extends AppCompatActivity {
         else {
             if (Email.equals(etEmail.getText().toString().trim())) {
 
-            }else {
+            } else {
                 //updateEmail();
             }
             return true;
@@ -174,12 +222,13 @@ public class UserDetailsActivity extends AppCompatActivity {
             etPassword.setVisibility(View.VISIBLE);
             etEmail.setVisibility(View.VISIBLE);
             etReEnterPassword.setVisibility(View.VISIBLE);
+            imgUpdateUserPitcher.setVisibility(View.VISIBLE);
 
             tvName.setVisibility(View.GONE);
             tvEmail.setVisibility(View.GONE);
             tvContactNumber.setVisibility(View.GONE);
             tvPassword.setVisibility(View.GONE);
-            btnSubmitButton.setText("Submit");
+            btnSubmitButton.setText("SUBMIT");
             progressBar.setVisibility(View.GONE);
 
             tvNumberVerified.setVisibility(View.GONE);
@@ -197,6 +246,7 @@ public class UserDetailsActivity extends AppCompatActivity {
             etPassword.setVisibility(View.GONE);
             etReEnterPassword.setVisibility(View.GONE);
             etEmail.setVisibility(View.GONE);
+            imgUpdateUserPitcher.setVisibility(View.GONE);
 
             tvName.setVisibility(View.VISIBLE);
             tvEmail.setVisibility(View.VISIBLE);
@@ -218,22 +268,16 @@ public class UserDetailsActivity extends AppCompatActivity {
 
 
     public void updateUserDetailsFirebase(String userID) {
-
-        databaseReference.child(userID).child("name").setValue(Name);
-        databaseReference.child(userID).child("email").setValue(Email);
-        databaseReference.child(userID).child("image").setValue(Image);
-        databaseReference.child(userID).child("number").setValue(Mobile_Number);
-        databaseReference.child(userID).child("password").setValue(Password);
-
+        progressBar.setVisibility(View.VISIBLE);
+        UploadImageFileToFirebaseStorage(selectedImageUri);
     }
 
     void updateDetails() {
-
         Name = etName.getText().toString().trim();
         Email = etEmail.getText().toString().trim();
         Mobile_Number = String.valueOf(etMobileNumber.getText().toString().trim());
         Password = etPassword.getText().toString().trim();
-        userDetailsRoomDatabase.productDao().updateDetails(Unique_ID,Name,Image,Email,Mobile_Number,Password);
+        userDetailsRoomDatabase.productDao().updateDetails(Unique_ID, Name, Image, Email, Mobile_Number, Password);
     }
 
     public void verifyEmail() {
@@ -277,5 +321,81 @@ public class UserDetailsActivity extends AppCompatActivity {
                                 });
                     }
                 });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == 2 && resultCode == RESULT_OK && null != data) {
+            selectedImageUri = data.getData();
+            imgUserPitcher.setImageURI(selectedImageUri);
+
+        }
+    }
+
+    public String GetFileExtension(Uri uri) {
+
+        ContentResolver contentResolver = getContentResolver();
+        MimeTypeMap mimeTypeMap = MimeTypeMap.getSingleton();
+        return mimeTypeMap.getExtensionFromMimeType(contentResolver.getType(uri));
+    }
+
+    public void UploadImageFileToFirebaseStorage(Uri FilePathUri) {
+
+        if (FilePathUri != null) {
+            String Storage_Path = Constant.Firebase_Storage_Path_For_Image;
+
+            final StorageReference storageReference2nd = storageRef.child(Storage_Path + System.currentTimeMillis() + "." + GetFileExtension(FilePathUri));
+
+            storageReference2nd.putFile(FilePathUri)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+
+                            storageReference2nd.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
+                                @Override
+                                public void onSuccess(Uri uri) {
+                                    String url = uri.toString();
+                                    Log.d("TAG", " Upload Image URL : " + url);
+                                    Image = url;
+
+                                    sh.putString("ImageURL", url);
+                                    sh.apply();
+                                    databaseReference.child(userID).child("name").setValue(Name);
+                                    databaseReference.child(userID).child("email").setValue(Email);
+                                    databaseReference.child(userID).child("image").setValue(Image);
+                                    databaseReference.child(userID).child("number").setValue(Mobile_Number);
+                                    databaseReference.child(userID).child("password").setValue(Password);
+
+                                }
+                            });
+
+                            String TempImageName = Name + " Profile Pic ";
+                            Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
+                            progressBar.setVisibility(View.GONE);
+
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception exception) {
+                    progressBar.setVisibility(View.GONE);
+
+                    Toast.makeText(UserDetailsActivity.this, exception.getMessage(), Toast.LENGTH_LONG).show();
+                    Log.d("TAG", "Exception : " + exception + ", Exception Message : " + exception.getLocalizedMessage());
+                }
+            }).addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                @Override
+                public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                    progressBar.setVisibility(View.VISIBLE);
+                }
+            });
+
+        } else {
+
+            Toast.makeText(UserDetailsActivity.this, "Please Select Image", Toast.LENGTH_LONG).show();
+
+        }
+        selectedImageUri = null;
+        progressBar.setVisibility(View.GONE);
     }
 }

@@ -16,6 +16,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.rajajainofficalproject.Class.Constant;
 import com.example.rajajainofficalproject.Database.UserDetails;
 import com.example.rajajainofficalproject.Database.UserDetailsRoomDatabase;
 import com.example.rajajainofficalproject.Interface.CallMethodInterface;
@@ -67,11 +68,11 @@ public class SignUpActivity extends AppCompatActivity {
         setContentView(R.layout.activity_sign_up);
 
         mAuth = FirebaseAuth.getInstance();
-        sharedPreferences = getSharedPreferences("user_details", this.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Constant.Shared_Preferences, this.MODE_PRIVATE);
         sh = sharedPreferences.edit();
 
         firebaseDatabase = FirebaseDatabase.getInstance();
-        myRef = firebaseDatabase.getReference("User_Details");
+        myRef = firebaseDatabase.getReference(Constant.Firebase_Database_Reference_Path);
         userDetailsRoomDatabase = UserDetailsRoomDatabase.getDatabase(this);
 
         progressBar = findViewById(R.id.progress_bar);
@@ -224,7 +225,7 @@ public class SignUpActivity extends AppCompatActivity {
                             //sendDate(firebaseUser.getUid());
                             sendDate(firebaseUser.getUid());
                             UniqueId = firebaseUser.getUid();
-                            sh.putString("user_unique_id", firebaseUser.getUid());
+                            sh.putString(Constant.Shared_Preferences_User_Unique_ID, firebaseUser.getUid());
                             sh.commit();
 
                         } else {

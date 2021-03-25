@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.VideoView;
 
+import com.example.rajajainofficalproject.Class.Constant;
 import com.example.rajajainofficalproject.Database.UserDetails;
 import com.example.rajajainofficalproject.Database.UserDetailsDao;
 import com.example.rajajainofficalproject.Database.UserDetailsRoomDatabase;
@@ -83,9 +84,9 @@ public class LoginActivity extends AppCompatActivity {
         //getSupportActionBar().hide();
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("User_Details");
+        myRef = database.getReference(Constant.Firebase_Database_Reference_Path);
         userDetailsRoomDatabase = UserDetailsRoomDatabase.getDatabase(this);
-        sharedPreferences = getSharedPreferences("user_details", this.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Constant.Shared_Preferences, this.MODE_PRIVATE);
         sh = sharedPreferences.edit();
 
         btnLogIn = findViewById(R.id.btn_submit);
@@ -279,7 +280,8 @@ public class LoginActivity extends AppCompatActivity {
                     if (etPassword.getText().toString().trim().equals(Pass)) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         if (!uniqueID.isEmpty()) {
-                            sh.putString("user_unique_id", uniqueID);
+                            sh.putString(Constant.Shared_Preferences_User_Unique_ID, uniqueID);
+                            sh.putString("ImageURL",snapshot.child("image").getValue(String.class));
                             sh.apply();
                             user_details = new UserDetails(uniqueID, userID, Name, Image, Email, Mobile_Number, Pass);
                             userDetailsRoomDatabase.productDao().insertDetails(user_details);

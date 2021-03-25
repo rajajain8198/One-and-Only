@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.example.rajajainofficalproject.Activity.DashBoardActivity;
 import com.example.rajajainofficalproject.Activity.LoginActivity;
+import com.example.rajajainofficalproject.Class.Constant;
 import com.example.rajajainofficalproject.Database.UserDetails;
 import com.example.rajajainofficalproject.Database.UserDetailsRoomDatabase;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,7 +52,7 @@ public class UserDetailsService extends Service {
         super.onCreate();
         mAuth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("User_Details");
+        myRef = database.getReference(Constant.Firebase_Database_Reference_Path);
         userDetailsRoomDatabase = UserDetailsRoomDatabase.getDatabase(this);
 
     }

@@ -32,6 +32,7 @@
         android:id="@+id/img_update_user_pitcher"
         android:layout_width="@dimen/DP40"
         android:layout_height="@dimen/DP40"
+        android:visibility="gone"
         android:background="@drawable/camera_image"
         app:layout_constraintBottom_toBottomOf="@id/civ_user_picture"
         app:layout_constraintRight_toRightOf="@id/civ_user_picture" />

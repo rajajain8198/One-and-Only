@@ -12,6 +12,7 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.rajajainofficalproject.Class.Constant;
 import com.example.rajajainofficalproject.R;
 import com.google.firebase.FirebaseException;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,7 +44,7 @@ public class VerifyNumberActivity extends AppCompatActivity {
 
         auth = FirebaseAuth.getInstance();
         database = FirebaseDatabase.getInstance();
-        myRef = database.getReference("User_Details");
+        myRef = database.getReference(Constant.Firebase_Database_Reference_Path);
         progressBar = findViewById(R.id.pb_progress);
         etEmail = findViewById(R.id.et_edit_text);
         btnSubmit = findViewById(R.id.btn_submit_email);
