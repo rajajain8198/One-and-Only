@@ -64,7 +64,7 @@ public class LoginActivity extends AppCompatActivity {
     CircleImageView GoogleLogin;
     private GoogleSignInClient mGoogleSignInClient;
     FirebaseAuth mAuth;
-    FirebaseUser currentUser;
+    FirebaseUser firebaseUser;
     FirebaseDatabase database;
     DatabaseReference myRef;
     SharedPreferences sharedPreferences;
@@ -83,6 +83,7 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         //getSupportActionBar().hide();
         mAuth = FirebaseAuth.getInstance();
+
         database = FirebaseDatabase.getInstance();
         myRef = database.getReference(Constant.Firebase_Database_Reference_Path);
         userDetailsRoomDatabase = UserDetailsRoomDatabase.getDatabase(this);
@@ -227,8 +228,8 @@ public class LoginActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             Toast.makeText(LoginActivity.this, "Success", Toast.LENGTH_SHORT).show();
                             Log.d("TAG", "signInWithCredential:success");
-                            FirebaseUser user = mAuth.getCurrentUser();
-                            updateUI(user);
+                            firebaseUser = mAuth.getCurrentUser();
+                            updateUI(firebaseUser);
                         } else {
                             Toast.makeText(LoginActivity.this, "Fail", Toast.LENGTH_SHORT).show();
                             Log.w("TAG", "signInWithCredential:failure", task.getException());
@@ -278,7 +279,7 @@ public class LoginActivity extends AppCompatActivity {
                     String userID = snapshot.child("userID").getValue(String.class);
                     String Pass = snapshot.child("password").getValue(String.class);
                     if (etPassword.getText().toString().trim().equals(Pass)) {
-                        FirebaseUser user = mAuth.getCurrentUser();
+                       firebaseUser = mAuth.getCurrentUser();
                         if (!uniqueID.isEmpty()) {
                             sh.putString(Constant.Shared_Preferences_User_Unique_ID, uniqueID);
                             sh.putString("ImageURL",snapshot.child("image").getValue(String.class));

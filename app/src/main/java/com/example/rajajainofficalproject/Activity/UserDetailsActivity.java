@@ -361,23 +361,19 @@ public class UserDetailsActivity extends AppCompatActivity {
 
                                     sh.putString("ImageURL", url);
                                     sh.apply();
-                                    databaseReference.child(userID).child("name").setValue(Name);
-                                    databaseReference.child(userID).child("email").setValue(Email);
                                     databaseReference.child(userID).child("image").setValue(Image);
-                                    databaseReference.child(userID).child("number").setValue(Mobile_Number);
-                                    databaseReference.child(userID).child("password").setValue(Password);
-
                                 }
                             });
 
                             String TempImageName = Name + " Profile Pic ";
-                            Toast.makeText(getApplicationContext(), "Image Uploaded Successfully ", Toast.LENGTH_LONG).show();
-                            progressBar.setVisibility(View.GONE);
+                            Toast.makeText(getApplicationContext(), " Details Save Successfully ", Toast.LENGTH_LONG).show();
 
                         }
                     }).addOnFailureListener(new OnFailureListener() {
                 @Override
                 public void onFailure(@NonNull Exception exception) {
+                    Toast.makeText(getApplicationContext(), " Details not Saved", Toast.LENGTH_LONG).show();
+
                     progressBar.setVisibility(View.GONE);
 
                     Toast.makeText(UserDetailsActivity.this, exception.getMessage(), Toast.LENGTH_LONG).show();
@@ -392,9 +388,11 @@ public class UserDetailsActivity extends AppCompatActivity {
 
         } else {
 
-            Toast.makeText(UserDetailsActivity.this, "Please Select Image", Toast.LENGTH_LONG).show();
-
         }
+        databaseReference.child(userID).child("name").setValue(Name);
+        databaseReference.child(userID).child("email").setValue(Email);
+        databaseReference.child(userID).child("number").setValue(Mobile_Number);
+        databaseReference.child(userID).child("password").setValue(Password);
         selectedImageUri = null;
         progressBar.setVisibility(View.GONE);
     }

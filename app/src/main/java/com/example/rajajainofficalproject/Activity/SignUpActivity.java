@@ -222,55 +222,51 @@ public class SignUpActivity extends AppCompatActivity {
                             user.put("mobile", Password);
 
                             firebaseUser = mAuth.getCurrentUser();
-                            //sendDate(firebaseUser.getUid());
-                            sendDate(firebaseUser.getUid());
                             UniqueId = firebaseUser.getUid();
-                            sh.putString(Constant.Shared_Preferences_User_Unique_ID, firebaseUser.getUid());
-                            sh.commit();
+                            //sendDate(firebaseUser.getUid());
+                            sendDataToFirebase(userID, firebaseUser.getUid());
 
                         } else {
                             progressBar.setVisibility(View.GONE);
-                            Log.w("TAG", "createUserWithEmail:failure" + task.getException());
+                            Log.d("TAG", "createUserWithEmail:failure" + task.getException());
                             Toast.makeText(SignUpActivity.this, "Authentication failed." + task.getException(), Toast.LENGTH_SHORT).show();
                         }
                     }
                 });
     }
 
+    // Firebase FireStore Database
+//    private void sendDate(String userid) {
+//        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+//
+//        DocumentReference documentReference = firestore
+//                .collection("NEW")
+//                .document(userid);
+//
+//        documentReference.set(user)
+//                .addOnCompleteListener(new OnCompleteListener<Void>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<Void> task) {
+//                       // sendDataToFirebase(userID, firebaseUser.getUid());
+//                        Toast.makeText(SignUpActivity.this, "Successful", Toast.LENGTH_SHORT).show();
+//                        progressBar.setVisibility(View.GONE);
+//
+//                    }
+//
+//
+//                })
+//                .addOnFailureListener(new OnFailureListener() {
+//                    @Override
+//                    public void onFailure(@NonNull Exception e) {
+//                        progressBar.setVisibility(View.GONE);
+//                        Toast.makeText(SignUpActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//
+//    }
 
-    private void sendDate(String userid) {
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-
-        // Add a new document with a generated ID
-        DocumentReference documentReference = firestore
-                .collection("NEW")
-                .document(userID);
-
-        documentReference.set(user)
-                .addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        sendDataToFirebase(userID, firebaseUser.getUid());
-                        Toast.makeText(SignUpActivity.this, "Successful", Toast.LENGTH_SHORT).show();
-                        progressBar.setVisibility(View.GONE);
-
-                    }
-
-
-                })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        progressBar.setVisibility(View.GONE);
-                        Toast.makeText(SignUpActivity.this, "Failed", Toast.LENGTH_SHORT).show();
-                    }
-                });
-
-    }
-
+    // Firebase Realtime Database
     public void sendDataToFirebase(String userID, String uniqueID) {
-
-        //Details saved in firebase
 
         user_details = new UserDetails(uniqueID, userID, Name, "", Email, Mobile_Number, Password);
         myRef.child(userID).setValue(user_details);
@@ -281,15 +277,18 @@ public class SignUpActivity extends AppCompatActivity {
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 userDetailsRoomDatabase.productDao().insertDetails(user_details);
-                Log.e("database", " : " + user_details.toString());
+                Log.d("TAG", "User Deatils : " + user_details.toString());
+                sh.putString(Constant.Shared_Preferences_User_Unique_ID, firebaseUser.getUid());
+                sh.commit();
+                verifyEmail();
                 openNextClass(DashBoardActivity.class);
                 Toast.makeText(SignUpActivity.this, "Save Room Database", Toast.LENGTH_SHORT).show();
-                verifyEmail();
+
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
-                Log.e("raja", "Failed to read value.", databaseError.toException());
+                Log.d("TAG", "Failed to read value.", databaseError.toException());
             }
         });
     }
